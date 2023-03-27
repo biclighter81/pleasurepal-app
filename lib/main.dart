@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_ffi_test/ff.io.dart';
+import 'package:pleasurepal_app/ff.io.dart';
 
 void main() {
   runApp(const MyApp());
