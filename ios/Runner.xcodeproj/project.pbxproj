@@ -8,15 +8,36 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		3584173F29D23345001558A3 /* libnative_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3584172D29D22FD4001558A3 /* libnative_static.a */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		A3671AD929957A9600604FF0 /* libnative_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3671AD529957A8000604FF0 /* libnative_static.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3584172C29D22FD4001558A3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3584172729D22FD4001558A3 /* native.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA60FB4393762969E816930C;
+			remoteInfo = "native-staticlib";
+		};
+		3584172E29D22FD4001558A3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3584172729D22FD4001558A3 /* native.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA609B8CB92BEAC3B2E0A336;
+			remoteInfo = "native-cdylib";
+		};
+		3584173D29D23337001558A3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3584172729D22FD4001558A3 /* native.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = CA609B8CB92B9F3B0DCC9C97;
+			remoteInfo = "native-cdylib";
+		};
 		A3671AD229957A8000604FF0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
@@ -29,13 +50,6 @@
 			containerPortal = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = CA60F0FEBE702969E816930C;
-			remoteInfo = "native-staticlib";
-		};
-		A3671AD629957A8A00604FF0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = CA60F0FEBE701C83950DBC35;
 			remoteInfo = "native-staticlib";
 		};
 /* End PBXContainerItemProxy section */
@@ -56,6 +70,7 @@
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		3584172729D22FD4001558A3 /* native.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = native.xcodeproj; path = ../../native/native.xcodeproj; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -75,13 +90,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A3671AD929957A9600604FF0 /* libnative_static.a in Frameworks */,
+				3584173F29D23345001558A3 /* libnative_static.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3584172829D22FD4001558A3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3584172D29D22FD4001558A3 /* libnative_static.a */,
+				3584172F29D22FD4001558A3 /* native.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +139,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				3584172729D22FD4001558A3 /* native.xcodeproj */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -130,8 +155,8 @@
 		A3671ACE29957A7F00604FF0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A3671AD329957A8000604FF0 /* native.dylib */,
 				A3671AD529957A8000604FF0 /* libnative_static.a */,
+				A3671AD329957A8000604FF0 /* native.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -160,7 +185,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				A3671AD729957A8A00604FF0 /* PBXTargetDependency */,
+				3584173E29D23337001558A3 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -195,6 +220,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 3584172829D22FD4001558A3 /* Products */;
+					ProjectRef = 3584172729D22FD4001558A3 /* native.xcodeproj */;
+				},
+				{
 					ProductGroup = A3671ACE29957A7F00604FF0 /* Products */;
 					ProjectRef = A3671ACD29957A7F00604FF0 /* native.xcodeproj */;
 				},
@@ -207,6 +236,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		3584172D29D22FD4001558A3 /* libnative_static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libnative_static.a;
+			remoteRef = 3584172C29D22FD4001558A3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3584172F29D22FD4001558A3 /* native.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = native.dylib;
+			remoteRef = 3584172E29D22FD4001558A3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		A3671AD329957A8000604FF0 /* native.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
@@ -251,7 +294,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin\n";
 		};
 		9740EEB61CF901F6004384FC /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -283,10 +326,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A3671AD729957A8A00604FF0 /* PBXTargetDependency */ = {
+		3584173E29D23337001558A3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "native-staticlib";
-			targetProxy = A3671AD629957A8A00604FF0 /* PBXContainerItemProxy */;
+			name = "native-cdylib";
+			targetProxy = 3584173D29D23337001558A3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -369,6 +412,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -497,6 +541,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -519,6 +564,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
