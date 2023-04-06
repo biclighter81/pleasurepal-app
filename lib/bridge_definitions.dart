@@ -8,8 +8,74 @@ import 'package:meta/meta.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:uuid/uuid.dart';
 
-abstract class Native {
-  Future<String> helloWorld({dynamic hint});
+abstract class ButtplugRs {
+  Stream<String> runEngine({required EngineOptionsExternal args, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kHelloWorldConstMeta;
+  FlutterRustBridgeTaskConstMeta get kRunEngineConstMeta;
+
+  Future<void> send({required String msgJson, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kSendConstMeta;
+
+  Future<void> stopEngine({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kStopEngineConstMeta;
+
+  Future<void> sendBackendServerMessage({required String msg, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kSendBackendServerMessageConstMeta;
+}
+
+class EngineOptionsExternal {
+  final String? sentryApiKey;
+  final String? deviceConfigJson;
+  final String? userDeviceConfigJson;
+  final String serverName;
+  final bool crashReporting;
+  final bool websocketUseAllInterfaces;
+  final int? websocketPort;
+  final String? websocketClientAddress;
+  final int? frontendWebsocketPort;
+  final bool frontendInProcessChannel;
+  final int maxPingTime;
+  final String? logLevel;
+  final bool allowRawMessages;
+  final bool useBluetoothLe;
+  final bool useSerialPort;
+  final bool useHid;
+  final bool useLovenseDongleSerial;
+  final bool useLovenseDongleHid;
+  final bool useXinput;
+  final bool useLovenseConnect;
+  final bool useDeviceWebsocketServer;
+  final int? deviceWebsocketServerPort;
+  final bool crashMainThread;
+  final bool crashTaskThread;
+
+  const EngineOptionsExternal({
+    this.sentryApiKey,
+    this.deviceConfigJson,
+    this.userDeviceConfigJson,
+    required this.serverName,
+    required this.crashReporting,
+    required this.websocketUseAllInterfaces,
+    this.websocketPort,
+    this.websocketClientAddress,
+    this.frontendWebsocketPort,
+    required this.frontendInProcessChannel,
+    required this.maxPingTime,
+    this.logLevel,
+    required this.allowRawMessages,
+    required this.useBluetoothLe,
+    required this.useSerialPort,
+    required this.useHid,
+    required this.useLovenseDongleSerial,
+    required this.useLovenseDongleHid,
+    required this.useXinput,
+    required this.useLovenseConnect,
+    required this.useDeviceWebsocketServer,
+    this.deviceWebsocketServerPort,
+    required this.crashMainThread,
+    required this.crashTaskThread,
+  });
 }

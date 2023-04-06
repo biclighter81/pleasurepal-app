@@ -17,29 +17,82 @@ import 'package:uuid/uuid.dart';
 
 import 'dart:ffi' as ffi;
 
-class NativeImpl implements Native {
-  final NativePlatform _platform;
-  factory NativeImpl(ExternalLibrary dylib) =>
-      NativeImpl.raw(NativePlatform(dylib));
+class ButtplugRsImpl implements ButtplugRs {
+  final ButtplugRsPlatform _platform;
+  factory ButtplugRsImpl(ExternalLibrary dylib) =>
+      ButtplugRsImpl.raw(ButtplugRsPlatform(dylib));
 
   /// Only valid on web/WASM platforms.
-  factory NativeImpl.wasm(FutureOr<WasmModule> module) =>
-      NativeImpl(module as ExternalLibrary);
-  NativeImpl.raw(this._platform);
-  Future<String> helloWorld({dynamic hint}) {
-    return _platform.executeNormal(FlutterRustBridgeTask(
-      callFfi: (port_) => _platform.inner.wire_helloWorld(port_),
+  factory ButtplugRsImpl.wasm(FutureOr<WasmModule> module) =>
+      ButtplugRsImpl(module as ExternalLibrary);
+  ButtplugRsImpl.raw(this._platform);
+  Stream<String> runEngine(
+      {required EngineOptionsExternal args, dynamic hint}) {
+    var arg0 = _platform.api2wire_box_autoadd_engine_options_external(args);
+    return _platform.executeStream(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_run_engine(port_, arg0),
       parseSuccessData: _wire2api_String,
-      constMeta: kHelloWorldConstMeta,
+      constMeta: kRunEngineConstMeta,
+      argValues: [args],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kRunEngineConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "run_engine",
+        argNames: ["args"],
+      );
+
+  Future<void> send({required String msgJson, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(msgJson);
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_send(port_, arg0),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kSendConstMeta,
+      argValues: [msgJson],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kSendConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "send",
+        argNames: ["msgJson"],
+      );
+
+  Future<void> stopEngine({dynamic hint}) {
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_stop_engine(port_),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kStopEngineConstMeta,
       argValues: [],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kHelloWorldConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kStopEngineConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "helloWorld",
+        debugName: "stop_engine",
         argNames: [],
+      );
+
+  Future<void> sendBackendServerMessage({required String msg, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(msg);
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) =>
+          _platform.inner.wire_send_backend_server_message(port_, arg0),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kSendBackendServerMessageConstMeta,
+      argValues: [msg],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kSendBackendServerMessageConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "send_backend_server_message",
+        argNames: ["msg"],
       );
 
   void dispose() {
@@ -58,20 +111,120 @@ class NativeImpl implements Native {
   Uint8List _wire2api_uint_8_list(dynamic raw) {
     return raw as Uint8List;
   }
+
+  void _wire2api_unit(dynamic raw) {
+    return;
+  }
 }
 
 // Section: api2wire
 
+@protected
+bool api2wire_bool(bool raw) {
+  return raw;
+}
+
+@protected
+int api2wire_u16(int raw) {
+  return raw;
+}
+
+@protected
+int api2wire_u32(int raw) {
+  return raw;
+}
+
+@protected
+int api2wire_u8(int raw) {
+  return raw;
+}
+
 // Section: finalizer
 
-class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
-  NativePlatform(ffi.DynamicLibrary dylib) : super(NativeWire(dylib));
+class ButtplugRsPlatform extends FlutterRustBridgeBase<ButtplugRsWire> {
+  ButtplugRsPlatform(ffi.DynamicLibrary dylib) : super(ButtplugRsWire(dylib));
 
 // Section: api2wire
 
+  @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_String(String raw) {
+    return api2wire_uint_8_list(utf8.encoder.convert(raw));
+  }
+
+  @protected
+  ffi.Pointer<wire_EngineOptionsExternal>
+      api2wire_box_autoadd_engine_options_external(EngineOptionsExternal raw) {
+    final ptr = inner.new_box_autoadd_engine_options_external_0();
+    _api_fill_to_wire_engine_options_external(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<ffi.Uint16> api2wire_box_autoadd_u16(int raw) {
+    return inner.new_box_autoadd_u16_0(api2wire_u16(raw));
+  }
+
+  @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_opt_String(String? raw) {
+    return raw == null ? ffi.nullptr : api2wire_String(raw);
+  }
+
+  @protected
+  ffi.Pointer<ffi.Uint16> api2wire_opt_box_autoadd_u16(int? raw) {
+    return raw == null ? ffi.nullptr : api2wire_box_autoadd_u16(raw);
+  }
+
+  @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_uint_8_list(Uint8List raw) {
+    final ans = inner.new_uint_8_list_0(raw.length);
+    ans.ref.ptr.asTypedList(raw.length).setAll(0, raw);
+    return ans;
+  }
 // Section: finalizer
 
 // Section: api_fill_to_wire
+
+  void _api_fill_to_wire_box_autoadd_engine_options_external(
+      EngineOptionsExternal apiObj,
+      ffi.Pointer<wire_EngineOptionsExternal> wireObj) {
+    _api_fill_to_wire_engine_options_external(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_engine_options_external(
+      EngineOptionsExternal apiObj, wire_EngineOptionsExternal wireObj) {
+    wireObj.sentry_api_key = api2wire_opt_String(apiObj.sentryApiKey);
+    wireObj.device_config_json = api2wire_opt_String(apiObj.deviceConfigJson);
+    wireObj.user_device_config_json =
+        api2wire_opt_String(apiObj.userDeviceConfigJson);
+    wireObj.server_name = api2wire_String(apiObj.serverName);
+    wireObj.crash_reporting = api2wire_bool(apiObj.crashReporting);
+    wireObj.websocket_use_all_interfaces =
+        api2wire_bool(apiObj.websocketUseAllInterfaces);
+    wireObj.websocket_port = api2wire_opt_box_autoadd_u16(apiObj.websocketPort);
+    wireObj.websocket_client_address =
+        api2wire_opt_String(apiObj.websocketClientAddress);
+    wireObj.frontend_websocket_port =
+        api2wire_opt_box_autoadd_u16(apiObj.frontendWebsocketPort);
+    wireObj.frontend_in_process_channel =
+        api2wire_bool(apiObj.frontendInProcessChannel);
+    wireObj.max_ping_time = api2wire_u32(apiObj.maxPingTime);
+    wireObj.log_level = api2wire_opt_String(apiObj.logLevel);
+    wireObj.allow_raw_messages = api2wire_bool(apiObj.allowRawMessages);
+    wireObj.use_bluetooth_le = api2wire_bool(apiObj.useBluetoothLe);
+    wireObj.use_serial_port = api2wire_bool(apiObj.useSerialPort);
+    wireObj.use_hid = api2wire_bool(apiObj.useHid);
+    wireObj.use_lovense_dongle_serial =
+        api2wire_bool(apiObj.useLovenseDongleSerial);
+    wireObj.use_lovense_dongle_hid = api2wire_bool(apiObj.useLovenseDongleHid);
+    wireObj.use_xinput = api2wire_bool(apiObj.useXinput);
+    wireObj.use_lovense_connect = api2wire_bool(apiObj.useLovenseConnect);
+    wireObj.use_device_websocket_server =
+        api2wire_bool(apiObj.useDeviceWebsocketServer);
+    wireObj.device_websocket_server_port =
+        api2wire_opt_box_autoadd_u16(apiObj.deviceWebsocketServerPort);
+    wireObj.crash_main_thread = api2wire_bool(apiObj.crashMainThread);
+    wireObj.crash_task_thread = api2wire_bool(apiObj.crashTaskThread);
+  }
 }
 
 // ignore_for_file: camel_case_types, non_constant_identifier_names, avoid_positional_boolean_parameters, annotate_overrides, constant_identifier_names
@@ -82,7 +235,7 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
 // ignore_for_file: type=lint
 
 /// generated by flutter_rust_bridge
-class NativeWire implements FlutterRustBridgeWireBase {
+class ButtplugRsWire implements FlutterRustBridgeWireBase {
   @internal
   late final dartApi = DartApiDl(init_frb_dart_api_dl);
 
@@ -91,11 +244,11 @@ class NativeWire implements FlutterRustBridgeWireBase {
       _lookup;
 
   /// The symbols are looked up in [dynamicLibrary].
-  NativeWire(ffi.DynamicLibrary dynamicLibrary)
+  ButtplugRsWire(ffi.DynamicLibrary dynamicLibrary)
       : _lookup = dynamicLibrary.lookup;
 
   /// The symbols are looked up with [lookup].
-  NativeWire.fromLookup(
+  ButtplugRsWire.fromLookup(
       ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
           lookup)
       : _lookup = lookup;
@@ -170,19 +323,113 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
       .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
 
-  void wire_helloWorld(
+  void wire_run_engine(
+    int port_,
+    ffi.Pointer<wire_EngineOptionsExternal> args,
+  ) {
+    return _wire_run_engine(
+      port_,
+      args,
+    );
+  }
+
+  late final _wire_run_enginePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_EngineOptionsExternal>)>>('wire_run_engine');
+  late final _wire_run_engine = _wire_run_enginePtr.asFunction<
+      void Function(int, ffi.Pointer<wire_EngineOptionsExternal>)>();
+
+  void wire_send(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> msg_json,
+  ) {
+    return _wire_send(
+      port_,
+      msg_json,
+    );
+  }
+
+  late final _wire_sendPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_send');
+  late final _wire_send = _wire_sendPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_stop_engine(
     int port_,
   ) {
-    return _wire_helloWorld(
+    return _wire_stop_engine(
       port_,
     );
   }
 
-  late final _wire_helloWorldPtr =
+  late final _wire_stop_enginePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
-          'wire_helloWorld');
-  late final _wire_helloWorld =
-      _wire_helloWorldPtr.asFunction<void Function(int)>();
+          'wire_stop_engine');
+  late final _wire_stop_engine =
+      _wire_stop_enginePtr.asFunction<void Function(int)>();
+
+  void wire_send_backend_server_message(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> msg,
+  ) {
+    return _wire_send_backend_server_message(
+      port_,
+      msg,
+    );
+  }
+
+  late final _wire_send_backend_server_messagePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>(
+      'wire_send_backend_server_message');
+  late final _wire_send_backend_server_message =
+      _wire_send_backend_server_messagePtr
+          .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  ffi.Pointer<wire_EngineOptionsExternal>
+      new_box_autoadd_engine_options_external_0() {
+    return _new_box_autoadd_engine_options_external_0();
+  }
+
+  late final _new_box_autoadd_engine_options_external_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_EngineOptionsExternal>
+              Function()>>('new_box_autoadd_engine_options_external_0');
+  late final _new_box_autoadd_engine_options_external_0 =
+      _new_box_autoadd_engine_options_external_0Ptr
+          .asFunction<ffi.Pointer<wire_EngineOptionsExternal> Function()>();
+
+  ffi.Pointer<ffi.Uint16> new_box_autoadd_u16_0(
+    int value,
+  ) {
+    return _new_box_autoadd_u16_0(
+      value,
+    );
+  }
+
+  late final _new_box_autoadd_u16_0Ptr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Uint16> Function(ffi.Uint16)>>(
+          'new_box_autoadd_u16_0');
+  late final _new_box_autoadd_u16_0 = _new_box_autoadd_u16_0Ptr
+      .asFunction<ffi.Pointer<ffi.Uint16> Function(int)>();
+
+  ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
+    int len,
+  ) {
+    return _new_uint_8_list_0(
+      len,
+    );
+  }
+
+  late final _new_uint_8_list_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_uint_8_list> Function(
+              ffi.Int32)>>('new_uint_8_list_0');
+  late final _new_uint_8_list_0 = _new_uint_8_list_0Ptr
+      .asFunction<ffi.Pointer<wire_uint_8_list> Function(int)>();
 
   void free_WireSyncReturn(
     WireSyncReturn ptr,
@@ -197,10 +444,99 @@ class NativeWire implements FlutterRustBridgeWireBase {
           'free_WireSyncReturn');
   late final _free_WireSyncReturn =
       _free_WireSyncReturnPtr.asFunction<void Function(WireSyncReturn)>();
+
+  int JNI_OnLoad(
+    int vm,
+    ffi.Pointer<ffi.Void> _res,
+  ) {
+    return _JNI_OnLoad(
+      vm,
+      _res,
+    );
+  }
+
+  late final _JNI_OnLoadPtr = _lookup<
+          ffi.NativeFunction<ffi.Int Function(ffi.Int, ffi.Pointer<ffi.Void>)>>(
+      'JNI_OnLoad');
+  late final _JNI_OnLoad =
+      _JNI_OnLoadPtr.asFunction<int Function(int, ffi.Pointer<ffi.Void>)>();
 }
 
 class _Dart_Handle extends ffi.Opaque {}
 
+class wire_uint_8_list extends ffi.Struct {
+  external ffi.Pointer<ffi.Uint8> ptr;
+
+  @ffi.Int32()
+  external int len;
+}
+
+class wire_EngineOptionsExternal extends ffi.Struct {
+  external ffi.Pointer<wire_uint_8_list> sentry_api_key;
+
+  external ffi.Pointer<wire_uint_8_list> device_config_json;
+
+  external ffi.Pointer<wire_uint_8_list> user_device_config_json;
+
+  external ffi.Pointer<wire_uint_8_list> server_name;
+
+  @ffi.Bool()
+  external bool crash_reporting;
+
+  @ffi.Bool()
+  external bool websocket_use_all_interfaces;
+
+  external ffi.Pointer<ffi.Uint16> websocket_port;
+
+  external ffi.Pointer<wire_uint_8_list> websocket_client_address;
+
+  external ffi.Pointer<ffi.Uint16> frontend_websocket_port;
+
+  @ffi.Bool()
+  external bool frontend_in_process_channel;
+
+  @ffi.Uint32()
+  external int max_ping_time;
+
+  external ffi.Pointer<wire_uint_8_list> log_level;
+
+  @ffi.Bool()
+  external bool allow_raw_messages;
+
+  @ffi.Bool()
+  external bool use_bluetooth_le;
+
+  @ffi.Bool()
+  external bool use_serial_port;
+
+  @ffi.Bool()
+  external bool use_hid;
+
+  @ffi.Bool()
+  external bool use_lovense_dongle_serial;
+
+  @ffi.Bool()
+  external bool use_lovense_dongle_hid;
+
+  @ffi.Bool()
+  external bool use_xinput;
+
+  @ffi.Bool()
+  external bool use_lovense_connect;
+
+  @ffi.Bool()
+  external bool use_device_websocket_server;
+
+  external ffi.Pointer<ffi.Uint16> device_websocket_server_port;
+
+  @ffi.Bool()
+  external bool crash_main_thread;
+
+  @ffi.Bool()
+  external bool crash_task_thread;
+}
+
 typedef DartPostCObjectFnType = ffi.Pointer<
-    ffi.NativeFunction<ffi.Bool Function(DartPort, ffi.Pointer<ffi.Void>)>>;
+    ffi.NativeFunction<
+        ffi.Bool Function(DartPort port_id, ffi.Pointer<ffi.Void> message)>>;
 typedef DartPort = ffi.Int64;

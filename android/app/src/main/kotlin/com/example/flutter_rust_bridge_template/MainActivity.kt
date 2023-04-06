@@ -1,4 +1,4 @@
-package com.example.pleasurepal_app
+package com.example.flutter_rust_bridge_template
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,3 +1,4 @@
+
 .DEFAULT_GOAL := help
 PROJECTNAME=$(shell basename "$(PWD)")
 SOURCES=$(sort $(wildcard ./src/*.rs ./src/**/*.rs))

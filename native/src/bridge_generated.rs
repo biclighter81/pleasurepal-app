@@ -19,16 +19,63 @@ use std::sync::Arc;
 
 // Section: imports
 
+use crate::options::EngineOptionsExternal;
+
 // Section: wire functions
 
-fn wire_helloWorld_impl(port_: MessagePort) {
+fn wire_run_engine_impl(
+    port_: MessagePort,
+    args: impl Wire2Api<EngineOptionsExternal> + UnwindSafe,
+) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
-            debug_name: "helloWorld",
+            debug_name: "run_engine",
+            port: Some(port_),
+            mode: FfiCallMode::Stream,
+        },
+        move || {
+            let api_args = args.wire2api();
+            move |task_callback| run_engine(task_callback.stream_sink(), api_args)
+        },
+    )
+}
+fn wire_send_impl(port_: MessagePort, msg_json: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "send",
             port: Some(port_),
             mode: FfiCallMode::Normal,
         },
-        move || move |task_callback| Ok(helloWorld()),
+        move || {
+            let api_msg_json = msg_json.wire2api();
+            move |task_callback| Ok(send(api_msg_json))
+        },
+    )
+}
+fn wire_stop_engine_impl(port_: MessagePort) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "stop_engine",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || move |task_callback| Ok(stop_engine()),
+    )
+}
+fn wire_send_backend_server_message_impl(
+    port_: MessagePort,
+    msg: impl Wire2Api<String> + UnwindSafe,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "send_backend_server_message",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_msg = msg.wire2api();
+            move |task_callback| Ok(send_backend_server_message(api_msg))
+        },
     )
 }
 // Section: wrapper structs
@@ -53,6 +100,29 @@ where
         (!self.is_null()).then(|| self.wire2api())
     }
 }
+
+impl Wire2Api<bool> for bool {
+    fn wire2api(self) -> bool {
+        self
+    }
+}
+
+impl Wire2Api<u16> for u16 {
+    fn wire2api(self) -> u16 {
+        self
+    }
+}
+impl Wire2Api<u32> for u32 {
+    fn wire2api(self) -> u32 {
+        self
+    }
+}
+impl Wire2Api<u8> for u8 {
+    fn wire2api(self) -> u8 {
+        self
+    }
+}
+
 // Section: impl IntoDart
 
 // Section: executor

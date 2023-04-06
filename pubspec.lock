@@ -125,10 +125,10 @@ packages:
     dependency: "direct dev"
     description:
       name: ffigen
-      sha256: "53f0fefd81be07f5722b71d3e1588e8a7cb9bcfd03d758319ea28e1eedb27296"
+      sha256: "94587f4c9699a4d0a25da95dc0b41903ddc69201d9bac3ca128ade8e67d56015"
       url: "https://pub.dev"
     source: hosted
-    version: "7.2.9"
+    version: "7.2.10"
   file:
     dependency: transitive
     description:
@@ -154,10 +154,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_rust_bridge
-      sha256: "2d5ac72a14fa84de55a4f3ac5a710f4e39e5aafc6faba01d2179d3c4b4d500f6"
+      sha256: "1a0adba913e47142057ff64680171497c167de7fef9b42cda090a55f59db3773"
       url: "https://pub.dev"
     source: hosted
-    version: "1.72.0"
+    version: "1.72.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -228,7 +228,7 @@ packages:
     source: hosted
     version: "0.2.0"
   meta:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: meta
       sha256: "6c268b42ed578a53088d834796959e4a1814b5e9e164f147f580a386e5decf42"
@@ -433,4 +433,4 @@ packages:
     source: hosted
     version: "2.1.0"
 sdks:
-  dart: ">=2.19.5 <3.0.0"
+  dart: ">=2.19.0 <3.0.0"
