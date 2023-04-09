@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:buttplug/client/client.dart';
 import 'package:buttplug/client/client_device.dart';
+import 'package:flutter_rust_bridge_template/pleasurepal/socket_bloc.dart';
 
 import '../engine/engine_control_bloc.dart';
 import 'backdoor_connector.dart';

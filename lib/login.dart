@@ -1,13 +1,25 @@
-//Login page
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openid_client/openid_client_io.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_rust_bridge_template/pleasurepal/auth_bloc.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<AuthBloc>(context).add(AuthEventLogin());
+    BlocProvider.of<AuthBloc>(context).stream.listen((event) {
+      if (event is AuthSuccess) {
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,46 +28,13 @@ class LoginPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Login Page'),
+            //try again button
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/', (route) => false);
+                BlocProvider.of<AuthBloc>(context).add(AuthEventLogin());
               },
-              child: Text('Home'),
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  var issuer = await Issuer.discover(Uri.parse(
-                      'https://keycloak.rimraf.de/realms/pleasurepal'));
-                  var client = new Client(issuer, 'pleasurepal');
-                  urlLauncher(String url) async {
-                    var uri = Uri.parse(url);
-                    if (await canLaunchUrl(uri) || Platform.isAndroid) {
-                      await launchUrl(uri);
-                    } else {
-                      throw 'Could not launch $url';
-                    }
-                  }
-
-                  var authenticator = Authenticator(client,
-                      scopes: [
-                        'openid',
-                        'profile',
-                        'email',
-                        'address',
-                        'phone',
-                        'offline_access'
-                      ],
-                      port: 4000,
-                      urlLancher: urlLauncher);
-                  var c = await authenticator.authorize();
-                  if (Platform.isAndroid || Platform.isIOS) {
-                    closeInAppWebView();
-                  }
-                  print(c.toJson());
-                },
-                child: Text('Login'))
+              child: const Text('Try again'),
+            )
           ],
         ),
       ),

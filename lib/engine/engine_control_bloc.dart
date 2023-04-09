@@ -87,7 +87,6 @@ class EngineControlBloc extends Bloc<EngineControlEvent, EngineControlState> {
       emit(EngineStartingState());
       return emit.forEach(_repo.engineStream, onData: (EngineOutput msg) {
         print(msg.buttplugMessage?.toJson());
-        print(msg.buttplugMessage?.deviceList?.devices);
         if (msg.engineMessage != null) {
           var engineMessage = msg.engineMessage!;
           if (engineMessage.engineStarted != null) {

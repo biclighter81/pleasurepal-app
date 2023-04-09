@@ -12,6 +12,8 @@ import 'package:flutter_rust_bridge_template/engine/engine_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rust_bridge_template/engine/foreground_engine_provider.dart';
 import 'package:flutter_rust_bridge_template/login.dart';
+import 'package:flutter_rust_bridge_template/pleasurepal/auth_bloc.dart';
+import 'package:flutter_rust_bridge_template/pleasurepal/socket_bloc.dart';
 import 'package:flutter_rust_bridge_template/util/util.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'ffi.dart';
@@ -54,6 +56,13 @@ class PleasurepalApp extends StatelessWidget {
       ].request();
     }*/
     EngineRepository repo = EngineRepository(DesktopEngineProvider());
+    var socketBloc = SocketBloc();
+    var authBloc = AuthBloc();
+    authBloc.stream.listen((state) {
+      if (state is AuthSuccess) {
+        socketBloc.add(SocketEventConnect(state.credential));
+      }
+    });
     var engineControlBloc = EngineControlBloc(repo);
     engineControlBloc.add(EngineControlEventStart());
     var deviceControlBloc =
@@ -74,7 +83,9 @@ class PleasurepalApp extends StatelessWidget {
     });
     return MultiBlocProvider(providers: [
       BlocProvider(create: (ctx) => engineControlBloc),
-      BlocProvider(create: (ctx) => deviceControlBloc)
+      BlocProvider(create: (ctx) => deviceControlBloc),
+      BlocProvider(create: (ctx) => authBloc),
+      BlocProvider(create: (ctx) => socketBloc),
     ], child: const PleasurepalView());
   }
 }
@@ -95,7 +106,7 @@ class PleasurepalView extends StatelessWidget {
             brightness: Brightness.dark,
             primarySwatch: Colors.purple,
             useMaterial3: true),
-        initialRoute: '/',
+        initialRoute: '/login',
         routes: {
           '/login': (context) => const LoginPage(),
           '/': (context) => const PleasurepalPage(),
@@ -117,13 +128,24 @@ class PleasurepalPage extends StatelessWidget {
           children: [
             Column(
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  child: Text('Login'),
-                ),
-                // device list
+                BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+                  if (state is AuthSuccess) {
+                    return Column(children: [
+                      Text(
+                          "Hello ${state.credential.idToken.claims.preferredUsername}"),
+                      BlocBuilder<SocketBloc, SocketState>(
+                          builder: (context, state) {
+                        if (state is SocketReady) {
+                          return Text("Connected");
+                        } else {
+                          return const Text("Not connected");
+                        }
+                      }),
+                    ]);
+                  } else {
+                    return const Text("Not logged in");
+                  }
+                }),
                 BlocBuilder<DeviceManagerBloc, DeviceManagerState>(
                     builder: (context, state) {
                   var deviceBloc = BlocProvider.of<DeviceManagerBloc>(context);

@@ -45,6 +45,8 @@ dependencies:
   device_info_plus: ^8.1.0
   openid_client: ^0.4.7
   url_launcher: ^6.1.10
+  http: ^0.13.5
+  socket_io_client: ^2.0.1
 
 dev_dependencies:
   flutter_test:
