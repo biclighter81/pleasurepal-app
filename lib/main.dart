@@ -1,7 +1,36 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:buttplug/buttplug.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rust_bridge_template/device/device_manager_bloc.dart';
+import 'package:flutter_rust_bridge_template/engine/desktop_engine_provider.dart';
+import 'package:flutter_rust_bridge_template/engine/engine_control_bloc.dart';
+import 'package:flutter_rust_bridge_template/engine/engine_repo.dart';
+import 'ffi.dart';
 
 void main() {
   runApp(const MyApp());
+  EngineRepository repo = EngineRepository(DesktopEngineProvider());
+  var engineControlBloc = EngineControlBloc(repo);
+  engineControlBloc.add(EngineControlEventStart());
+  var deviceControlBloc =
+      DeviceManagerBloc(engineControlBloc.stream, engineControlBloc.add);
+  engineControlBloc.stream.forEach((state) {
+    if (state is ServerLogMessageState) {
+      print(state.message.message);
+    }
+    if (state is ProviderLogMessageState) {
+      print(state.message.message);
+    }
+    if (state is EngineServerCreatedState) {
+      print("Engine started, starting device manager");
+      deviceControlBloc.add(DeviceManagerEngineStartedEvent());
+    }
+    if (state is EngineStoppedState) {
+      deviceControlBloc.add(DeviceManagerEngineStoppedEvent());
+    }
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -89,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text("You're running on")
+            const Text("You're running on"),
           ],
         ),
       ),
