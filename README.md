@@ -67,3 +67,14 @@ The [SPDX](https://spdx.dev/) license identifier for this project is `MIT OR Apa
 ## Json Serialize Codegen
 
 flutter pub run build_runner build --delete-conflicting-outputs
+AR=llvm-ar RANLIB=llvm-ranlib cargo build --target aarch64-linux-android
+AR=llvm-ar RANLIB=llvm-ranlib cargo build --target armv7-linux-androideabi
+AR=llvm-ar RANLIB=llvm-ranlib cargo build --target i686-linux-android
+
+/Users/moritzbecker/Library/Android/sdk/ndk/25.2.9519653/build/tools/make_standalone_toolchain.py --api 26 --arch arm64 --install-dir toolchains/arm64
+
+/Users/moritzbecker/Library/Android/sdk/ndk/25.2.9519653/build/tools/make_standalone_toolchain.py --api 26 --arch arm --install-dir toolchains/arm
+
+/Users/moritzbecker/Library/Android/sdk/ndk/25.2.9519653/build/tools/make_standalone_toolchain.py --api 26 --arch x86 --install-dir toolchains/x86
+
+alle obigen toolchains müssen zum path hinzugefügt werden, da llvm sie sonst im build prozess nicht findet

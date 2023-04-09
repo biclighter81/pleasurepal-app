@@ -3,11 +3,13 @@ import 'dart:io';
 
 import 'package:buttplug/buttplug.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_rust_bridge_template/device/device_manager_bloc.dart';
 import 'package:flutter_rust_bridge_template/engine/desktop_engine_provider.dart';
 import 'package:flutter_rust_bridge_template/engine/engine_control_bloc.dart';
 import 'package:flutter_rust_bridge_template/engine/engine_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rust_bridge_template/engine/foreground_engine_provider.dart';
 import 'ffi.dart';
 
 void main() {
@@ -20,6 +22,8 @@ class PleasurepalApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     EngineRepository repo = EngineRepository(DesktopEngineProvider());
+    //EngineRepository repo =
+    //    EngineRepository(ForegroundTaskLibraryEngineProvider());
     var engineControlBloc = EngineControlBloc(repo);
     engineControlBloc.add(EngineControlEventStart());
     var deviceControlBloc =

@@ -6,7 +6,7 @@ edition = "2021"
 [lib]
 name = "engine"
 path = "src/lib.rs"
-crate-type = ["staticlib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1.0.70"
@@ -26,3 +26,10 @@ tokio = "1.27.0"
 tokio-util = "0.7.7"
 tracing = "0.1.37"
 tracing-futures = "0.2.5"
+
+[target.'cfg(target_os = "android")'.dependencies]
+# THESE VERSIONS ABSOLUTELY, POSITIVELY MUST MATCH WHATEVER BUTTPLUG LINKS, OTHERWISE THERE WILL BE
+# STATIC MISALIGNMENT AND YOU DO NOT WANT TO SPEND ANOTHER 3 DAYS DEBUGGING THAT.
+jni = "0.19.0"
+jni-utils = "0.1.0"
+openssl-sys = {version = "0.9.80", features=["vendored"]}

@@ -11,11 +11,15 @@ export 'bridge_definitions.dart';
 export 'bridge_generated.dart';
 import 'dart:io' as io;
 
-const _base = 'native';
+const _base = 'engine';
 
 // On MacOS, the dynamic library is not bundled with the binary,
 // but rather directly **linked** against the binary.
-final _dylib = io.Platform.isWindows ? '$_base.dll' : 'lib$_base.so';
+final _dylib = io.Platform.isWindows
+    ? '$_base.dll'
+    : io.Platform.isLinux
+        ? 'lib/lib$_base.so'
+        : 'lib$_base.so';
 
 final ButtplugRs api = ButtplugRsImpl(io.Platform.isIOS || io.Platform.isMacOS
     ? DynamicLibrary.executable()
