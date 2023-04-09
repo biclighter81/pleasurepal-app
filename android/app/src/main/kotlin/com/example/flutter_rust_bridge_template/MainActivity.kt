@@ -5,6 +5,5 @@ import io.flutter.embedding.android.FlutterActivity
 class MainActivity: FlutterActivity() {
     init {
         System.loadLibrary("engine");
-        System.out.println("after engine load");
     }
 }

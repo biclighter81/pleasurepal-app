@@ -24,7 +24,8 @@
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
-    <application android:label="flutter_rust_bridge_template" android:name="${applicationName}">
+    <application android:label="flutter_rust_bridge_template" android:name="${applicationName}"
+        android:usesCleartextTraffic="true">
         <activity android:name=".MainActivity" android:exported="true"
             android:launchMode="singleTop" android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

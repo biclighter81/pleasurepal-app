@@ -138,23 +138,23 @@ CA60D80E104798AF0B5890DB,
             productReference = CA60C64BEB2CA96E367A6574;
             productType = "com.apple.product-type.library.static";
         };
-        CA6015F036F2F2974436D9EB /* engine-cdylib */ = {
-            isa = PBXNativeTarget;
-            buildConfigurationList = CA60C67BC6E3F2974436D9EB;
-            buildPhases = (
-                CA60F58FFB04F2974436D9EB /* Sources */,
-                CA60D80E1047AF6EBB7F357C /* Universal Binary lipo */,
-            );
-            buildRules = (
-                CA60D80E1047AC6C1400ACA8 /* PBXBuildRule */,
-            );
-            dependencies = (
-            );
-            name = "engine-cdylib";
-            productName = "engine.dylib";
-            productReference = CA6015F036F2586451089601;
-            productType = "com.apple.product-type.library.dynamic";
-        };
+        //CA6015F036F2F2974436D9EB /* engine-cdylib */ = {
+        //    isa = PBXNativeTarget;
+        //    buildConfigurationList = CA60C67BC6E3F2974436D9EB;
+        //    buildPhases = (
+        //        CA60F58FFB04F2974436D9EB /* Sources */,
+        //        CA60D80E1047AF6EBB7F357C /* Universal Binary lipo */,
+        //    );
+        //    buildRules = (
+        //        CA60D80E1047AC6C1400ACA8 /* PBXBuildRule */,
+        //    );
+        //    dependencies = (
+        //    );
+        //    name = "engine-cdylib";
+        //    productName = "engine.dylib";
+        //    productReference = CA6015F036F2586451089601;
+        //    productType = "com.apple.product-type.library.dynamic";
+        //};
         
 /* End PBXNativeTarget section */
 

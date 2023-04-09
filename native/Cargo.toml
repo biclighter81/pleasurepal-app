@@ -6,7 +6,10 @@ edition = "2021"
 [lib]
 name = "engine"
 path = "src/lib.rs"
-crate-type = ["cdylib"]
+crate-type = ["staticlib"]
+
+[target.'cfg(target_os = "android")']
+crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 anyhow = "1.0.70"
