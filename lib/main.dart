@@ -1,22 +1,13 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:buttplug/buttplug.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_rust_bridge_template/device/device_manager_bloc.dart';
-import 'package:flutter_rust_bridge_template/engine/desktop_engine_provider.dart';
-import 'package:flutter_rust_bridge_template/engine/engine_control_bloc.dart';
-import 'package:flutter_rust_bridge_template/engine/engine_repo.dart';
+import 'package:pleasurepal/device/device_manager_bloc.dart';
+import 'package:pleasurepal/engine/desktop_engine_provider.dart';
+import 'package:pleasurepal/engine/engine_control_bloc.dart';
+import 'package:pleasurepal/engine/engine_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_rust_bridge_template/engine/foreground_engine_provider.dart';
-import 'package:flutter_rust_bridge_template/login.dart';
-import 'package:flutter_rust_bridge_template/pleasurepal/auth_bloc.dart';
-import 'package:flutter_rust_bridge_template/pleasurepal/socket_bloc.dart';
-import 'package:flutter_rust_bridge_template/util/util.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'ffi.dart';
+import 'package:pleasurepal/login.dart';
+import 'package:pleasurepal/pleasurepal/auth_bloc.dart';
+import 'package:pleasurepal/pleasurepal/socket_bloc.dart';
 
 void main() {
   runApp(const PleasurepalApp());
@@ -56,6 +47,11 @@ class PleasurepalApp extends StatelessWidget {
       ].request();
     }*/
     EngineRepository repo = EngineRepository(DesktopEngineProvider());
+    if (kDebugMode) {
+      print("Debug mode, stopping engine first.");
+      // Make sure the engine is stopped, just in case we've reloaded.
+      repo.stop();
+    }
     var socketBloc = SocketBloc();
     var authBloc = AuthBloc();
     authBloc.stream.listen((state) {
@@ -67,6 +63,11 @@ class PleasurepalApp extends StatelessWidget {
     engineControlBloc.add(EngineControlEventStart());
     var deviceControlBloc =
         DeviceManagerBloc(engineControlBloc.stream, engineControlBloc.add);
+    socketBloc.stream.listen((state) {
+      if (state is SocketCommand) {
+        deviceControlBloc.add(DeviceManagerCommandEvent(state));
+      }
+    });
     engineControlBloc.stream.forEach((state) {
       if (state is ServerLogMessageState) {
         print(state.message.message);
@@ -133,46 +134,33 @@ class PleasurepalPage extends StatelessWidget {
                     return Column(children: [
                       Text(
                           "Hello ${state.credential.idToken.claims.preferredUsername}"),
-                      BlocBuilder<SocketBloc, SocketState>(
-                          builder: (context, state) {
-                        if (state is SocketReady) {
-                          return Text("Connected");
-                        } else {
-                          return const Text("Not connected");
-                        }
-                      }),
                     ]);
                   } else {
                     return const Text("Not logged in");
                   }
                 }),
                 BlocBuilder<DeviceManagerBloc, DeviceManagerState>(
-                    builder: (context, state) {
-                  var deviceBloc = BlocProvider.of<DeviceManagerBloc>(context);
-                  return Column(
-                    children: [
-                      for (var device in deviceBloc.devices)
-                        Row(
-                          children: [
-                            TextButton(
-                                onPressed: () {
-                                  var cmd = ButtplugDeviceCommand.setVec(
-                                      [VibrateComponent(2)]);
-                                  device.device!.vibrate(cmd);
-                                },
-                                child: Text(device.device!.name)),
-                            TextButton(
-                                onPressed: () {
-                                  device.device!.vibrate(
-                                      ButtplugDeviceCommand.setVec(
-                                          [VibrateComponent(0)]));
-                                },
-                                child: const Text("Stop")),
-                          ],
-                        )
-                    ],
-                  );
-                }),
+                  builder: (context, state) {
+                    var deviceBloc =
+                        BlocProvider.of<DeviceManagerBloc>(context);
+                    return Column(
+                      children: [
+                        for (var device in deviceBloc.devices)
+                          Row(
+                            children: [
+                              Text(device.device!.name),
+                              Switch(
+                                  value: device.active,
+                                  onChanged: (value) {
+                                    deviceBloc.add(
+                                        DeviceManagerDeviceActiveEvent(device));
+                                  }),
+                            ],
+                          )
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
             // start scanning button

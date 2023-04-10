@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:buttplug/messages/messages.dart';
-import 'package:flutter_rust_bridge_template/engine/engine_repo.dart';
+import 'package:pleasurepal/engine/engine_repo.dart';
 
 import 'engine_messages.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_rust_bridge_template/ffi.dart';
+import 'package:pleasurepal/ffi.dart';
 
 import 'engine_provider.dart';
 

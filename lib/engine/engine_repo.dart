@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:buttplug/buttplug.dart';
-import 'package:flutter_rust_bridge_template/engine/engine_messages.dart';
-import 'package:flutter_rust_bridge_template/engine/engine_provider.dart';
+import 'package:pleasurepal/engine/engine_messages.dart';
+import 'package:pleasurepal/engine/engine_provider.dart';
 
 class EngineOutput {
   final EngineMessage? engineMessage;

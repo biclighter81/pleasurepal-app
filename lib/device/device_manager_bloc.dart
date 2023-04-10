@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:buttplug/client/client.dart';
 import 'package:buttplug/client/client_device.dart';
-import 'package:flutter_rust_bridge_template/pleasurepal/socket_bloc.dart';
+import 'package:buttplug/messages/enums.dart';
+import 'package:pleasurepal/pleasurepal/socket_bloc.dart';
 
 import '../engine/engine_control_bloc.dart';
 import 'backdoor_connector.dart';
@@ -29,6 +32,18 @@ class DeviceManagerStartScanningEvent extends DeviceManagerEvent {}
 
 class DeviceManagerStopScanningEvent extends DeviceManagerEvent {}
 
+class DeviceManagerDeviceActiveEvent extends DeviceManagerEvent {
+  final DeviceCubit device;
+
+  DeviceManagerDeviceActiveEvent(this.device);
+}
+
+class DeviceManagerCommandEvent extends DeviceManagerEvent {
+  final dynamic command;
+
+  DeviceManagerCommandEvent(this.command);
+}
+
 class DeviceManagerState {}
 
 class DeviceManagerInitialState extends DeviceManagerState {}
@@ -37,6 +52,18 @@ class DeviceManagerDeviceOnlineState extends DeviceManagerState {
   final DeviceCubit device;
 
   DeviceManagerDeviceOnlineState(this.device);
+}
+
+class DeviceManagerDeviceActiveState extends DeviceManagerState {
+  final DeviceCubit device;
+
+  DeviceManagerDeviceActiveState(this.device);
+}
+
+class DeviceManagerDeviceInactiveState extends DeviceManagerState {
+  final DeviceCubit device;
+
+  DeviceManagerDeviceInactiveState(this.device);
 }
 
 class DeviceManagerDeviceOfflineState extends DeviceManagerState {
@@ -49,17 +76,23 @@ class DeviceManagerStartScanningState extends DeviceManagerState {}
 
 class DeviceManagerStopScanningState extends DeviceManagerState {}
 
+class DeviceCubitState extends DeviceCubit {
+  DeviceCubitState(ButtplugClientDevice? device) : super(device);
+  bool active = false;
+}
+
 class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
   ButtplugClient? _internalClient;
   bool _scanning = false;
-  final List<DeviceCubit> _devices = [];
+  final List<DeviceCubitState> _devices = [];
+  Stream<List<DeviceCubitState>> get deviceStream =>
+      Stream.fromIterable([_devices]);
   final Stream<EngineControlState> _outputStream;
   final SendFunc _sendFunc;
 
   DeviceManagerBloc(this._outputStream, this._sendFunc)
       : super(DeviceManagerInitialState()) {
     on<DeviceManagerEngineStartedEvent>((event, emit) async {
-      print("Engine started, starting device manager");
       // Start our internal buttplug client.
       var connector = ButtplugBackdoorClientConnector(_outputStream, _sendFunc);
       var client = ButtplugClient("Backdoor Client");
@@ -80,9 +113,30 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
       _internalClient = client;
     });
 
+    on<DeviceManagerDeviceActiveEvent>((event, emit) {
+      // Move the active device to active.
+      var deviceBloc = _devices
+          .firstWhere((deviceBloc) => deviceBloc.device == event.device.device);
+      if (deviceBloc.active) {
+        deviceBloc.active = false;
+        emit(DeviceManagerDeviceInactiveState(deviceBloc));
+      } else {
+        deviceBloc.active = true;
+        emit(DeviceManagerDeviceActiveState(deviceBloc));
+      }
+    });
+
     on<DeviceManagerDeviceAddedEvent>((event, emit) {
       var deviceBloc = DeviceCubit(event.device);
-      _devices.add(deviceBloc);
+      _devices.add(DeviceCubitState(event.device));
+      /*event.device
+          .rotate(ButtplugDeviceCommand.setAll(RotateComponent(0, true)));
+      event.device.linear(ButtplugDeviceCommand.setAll(LinearComponent(0, 0)));
+      event.device.scalar(ButtplugDeviceCommand.setAll(
+          ScalarComponent(0, ActuatorType.Vibrate)));
+      event.device.vibrate(ButtplugDeviceCommand.setAll(VibrateComponent(0)));
+      */
+      _internalClient?.stopAllDevices();
       emit(DeviceManagerDeviceOnlineState(deviceBloc));
     });
 
@@ -126,7 +180,25 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
       await _internalClient!.stopScanning();
       emit(DeviceManagerStopScanningState());
     }));
+
+    on<DeviceManagerCommandEvent>(((event, emit) async {
+      if (_internalClient == null) {
+        return;
+      }
+      _devices.forEach((element) async {
+        if (element.active) {
+          print("Sending command to ${element.device?.name}");
+          await _internalClient?.stopAllDevices();
+          await element.device!
+              .vibrate(ButtplugDeviceCommand.setAll(VibrateComponent(0.1)));
+          //vibrate for 10 seconds
+          Future.delayed(Duration(seconds: 1), () async {
+            await _internalClient?.stopAllDevices();
+          });
+        }
+      });
+    }));
   }
-  List<DeviceCubit> get devices => _devices;
+  List<DeviceCubitState> get devices => _devices;
   bool get scanning => _scanning;
 }
