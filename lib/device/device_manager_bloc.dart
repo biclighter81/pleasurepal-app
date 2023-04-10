@@ -7,6 +7,7 @@ import 'package:buttplug/messages/enums.dart';
 import 'package:pleasurepal/pleasurepal/socket_bloc.dart';
 
 import '../engine/engine_control_bloc.dart';
+import '../pleasurepal/pleasurepal_events.dart';
 import 'backdoor_connector.dart';
 import 'device_cubit.dart';
 
@@ -39,7 +40,7 @@ class DeviceManagerDeviceActiveEvent extends DeviceManagerEvent {
 }
 
 class DeviceManagerCommandEvent extends DeviceManagerEvent {
-  final dynamic command;
+  final PleasurepalDeviceCommand command;
 
   DeviceManagerCommandEvent(this.command);
 }
@@ -189,10 +190,12 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
         if (element.active) {
           print("Sending command to ${element.device?.name}");
           await _internalClient?.stopAllDevices();
-          await element.device!
-              .vibrate(ButtplugDeviceCommand.setAll(VibrateComponent(0.1)));
+          print(event.command.duration);
+          await element.device!.vibrate(ButtplugDeviceCommand.setAll(
+              VibrateComponent(event.command.intensity!)));
           //vibrate for 10 seconds
-          Future.delayed(Duration(seconds: 1), () async {
+          Future.delayed(Duration(seconds: event.command.duration!.toInt()),
+              () async {
             await _internalClient?.stopAllDevices();
           });
         }

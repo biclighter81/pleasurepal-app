@@ -1,18 +1,16 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:buttplug/buttplug.dart';
-import 'package:pleasurepal/device/device_cubit.dart';
-import 'package:pleasurepal/device/device_manager_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:openid_client/openid_client.dart';
+import 'package:pleasurepal/pleasurepal/pleasurepal_events.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 Future<io.Socket> connectSocket(Credential cred) async {
   var tokenRes = await cred.getTokenResponse();
   var token = tokenRes.accessToken;
   io.Socket socket = io.io(
-      //'https://ws.pleasurepal.de',
-      'http://localhost:80',
+      kDebugMode ? 'http://localhost:80' : 'https://pleasurepal.com',
       io.OptionBuilder()
           .disableAutoConnect()
           .setTransports(['websocket']).setAuth({
@@ -41,7 +39,7 @@ class SocketCommand extends SocketState {
 class SocketEvent {}
 
 class SocketEventPleasurepalCommand extends SocketEvent {
-  final dynamic command;
+  final PleasurepalDeviceCommand command;
 
   SocketEventPleasurepalCommand(this.command);
 }
@@ -62,8 +60,9 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
       emit(SocketConnecting());
       try {
         var socket = await connectSocket(event.credential);
-        socket.on('command', (data) {
-          add(SocketEventPleasurepalCommand(data));
+        socket.on('device-command', (data) {
+          var command = PleasurepalDeviceCommand.fromJson(data);
+          add(SocketEventPleasurepalCommand(command));
         });
         emit(SocketReady());
       } catch (e) {

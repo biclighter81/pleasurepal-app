@@ -65,7 +65,7 @@ class PleasurepalApp extends StatelessWidget {
         DeviceManagerBloc(engineControlBloc.stream, engineControlBloc.add);
     socketBloc.stream.listen((state) {
       if (state is SocketCommand) {
-        deviceControlBloc.add(DeviceManagerCommandEvent(state));
+        deviceControlBloc.add(DeviceManagerCommandEvent(state.command));
       }
     });
     engineControlBloc.stream.forEach((state) {
