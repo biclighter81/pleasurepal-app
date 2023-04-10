@@ -5,7 +5,6 @@ part of 'pleasurepal_events.dart';
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
-
 PleasurepalDeviceCommand _$PleasurepalDeviceCommandFromJson(
         Map<String, dynamic> json) =>
     PleasurepalDeviceCommand()

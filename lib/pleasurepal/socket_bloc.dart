@@ -10,7 +10,7 @@ Future<io.Socket> connectSocket(Credential cred) async {
   var tokenRes = await cred.getTokenResponse();
   var token = tokenRes.accessToken;
   io.Socket socket = io.io(
-      kDebugMode ? 'http://localhost:80' : 'https://pleasurepal.com',
+      kDebugMode ? 'http://localhost:80' : 'https://ws.pleasurepal.de',
       io.OptionBuilder()
           .disableAutoConnect()
           .setTransports(['websocket']).setAuth({

@@ -138,6 +138,7 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
       event.device.vibrate(ButtplugDeviceCommand.setAll(VibrateComponent(0)));
       */
       _internalClient?.stopAllDevices();
+
       emit(DeviceManagerDeviceOnlineState(deviceBloc));
     });
 
