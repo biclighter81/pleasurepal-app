@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pleasurepal/debug.dart';
 import 'package:pleasurepal/device/device_manager_bloc.dart';
 import 'package:pleasurepal/engine/desktop_engine_provider.dart';
 import 'package:pleasurepal/engine/engine_control_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:pleasurepal/engine/engine_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pleasurepal/login.dart';
 import 'package:pleasurepal/pleasurepal/auth_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pleasurepal/pleasurepal/socket_bloc.dart';
 
 void main() {
@@ -100,17 +102,39 @@ class PleasurepalView extends StatelessWidget {
         title: 'pleasurepal',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+            fontFamily: GoogleFonts.poppins().fontFamily,
             brightness: Brightness.light,
             primarySwatch: Colors.purple,
+            toggleButtonsTheme: ToggleButtonsThemeData(
+              hoverColor: Colors.white,
+              fillColor: Colors.white,
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFBE6AFF))),
+            buttonTheme: ButtonThemeData(
+                buttonColor: const Color(0xFFBE6AFF),
+                textTheme: ButtonTextTheme.primary),
+            colorScheme: const ColorScheme(
+                background: Color(0xff41414B),
+                brightness: Brightness.light,
+                error: Color(0xffFF0000),
+                onBackground: Color(0xffFFFFFF),
+                onError: Color(0xffFFFFFF),
+                onPrimary: Color(0xffFFFFFF),
+                onSecondary: Color(0xffFFFFFF),
+                primary: Color(0xFFBE6AFF),
+                primaryContainer: Color(0XFFFFFFFF),
+                secondary: Color(0xffFFFFFF),
+                surface: Color(0xff1E1E1E),
+                onSurface: Color(0xffFFFFFF)),
+            //color scheme background
             useMaterial3: true),
-        darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            primarySwatch: Colors.purple,
-            useMaterial3: true),
-        initialRoute: '/login',
+        initialRoute: '/',
         routes: {
           '/login': (context) => const LoginPage(),
           '/': (context) => const PleasurepalPage(),
+          '/debug': (context) => const DebugPage()
         });
   }
 }
@@ -122,58 +146,103 @@ class PleasurepalPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('pleasurepal'),
+          backgroundColor: Color(0xff20202B),
+          title: Text('pleasurepal'.toUpperCase(),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: GoogleFonts.poppins(fontWeight: FontWeight.w900)
+                      .fontFamily)),
         ),
-        body: Center(
-            child: Column(
-          children: [
-            Column(
-              children: [
-                BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-                  if (state is AuthSuccess) {
-                    return Column(children: [
-                      Text(
-                          "Hello ${state.credential.idToken.claims.preferredUsername}"),
-                    ]);
-                  } else {
-                    return const Text("Not logged in");
-                  }
-                }),
-                BlocBuilder<DeviceManagerBloc, DeviceManagerState>(
-                  builder: (context, state) {
+        body: Container(
+            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Stack(fit: StackFit.expand, children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Connect your devices'.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily:
+                          GoogleFonts.poppins(fontWeight: FontWeight.bold)
+                              .fontFamily,
+                    ),
+                  ),
+                  Text(
+                    'Connect devices to use in pleasurepal'.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11,
+                    ),
+                  ),
+                  SizedBox(height: 25),
+                  BlocBuilder<DeviceManagerBloc, DeviceManagerState>(
+                      builder: (context, state) {
                     var deviceBloc =
                         BlocProvider.of<DeviceManagerBloc>(context);
-                    return Column(
-                      children: [
-                        for (var device in deviceBloc.devices)
-                          Row(
-                            children: [
-                              Text(device.device!.name),
-                              Switch(
-                                  value: device.active,
-                                  onChanged: (value) {
-                                    deviceBloc.add(
-                                        DeviceManagerDeviceActiveEvent(device));
-                                  }),
-                            ],
-                          )
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
-            // start scanning button
-            BlocBuilder<DeviceManagerBloc, DeviceManagerState>(
-                builder: (context, state) {
-              var deviceBloc = BlocProvider.of<DeviceManagerBloc>(context);
-              return TextButton(
-                  onPressed: () {
-                    deviceBloc.add(DeviceManagerStartScanningEvent());
-                  },
-                  child: const Text("Start Scanning"));
-            }),
-          ],
-        )));
+                    return ElevatedButton(
+                        onPressed: () => {
+                              if (deviceBloc.scanning)
+                                deviceBloc.add(DeviceManagerStopScanningEvent())
+                              else
+                                {
+                                  deviceBloc
+                                      .add(DeviceManagerStartScanningEvent())
+                                }
+                            },
+                        child: Text(
+                            deviceBloc.scanning
+                                ? 'Stop scanning'.toUpperCase()
+                                : 'Start scanning'.toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                            )));
+                  }),
+
+                  //full width container
+                  BlocBuilder<DeviceManagerBloc, DeviceManagerState>(
+                    builder: (context, state) {
+                      var deviceBloc =
+                          BlocProvider.of<DeviceManagerBloc>(context);
+                      return Column(
+                        children: [
+                          for (var device in deviceBloc.devices)
+                            Container(
+                                width: double.infinity,
+                                child: Row(children: [
+                                  Text(
+                                    device.device!.name.toUpperCase(),
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.bold)
+                                            .fontFamily),
+                                  ),
+                                  Spacer(),
+                                  Switch(
+                                      value: device.active,
+                                      onChanged: (value) {
+                                        deviceBloc.add(
+                                            DeviceManagerDeviceActiveEvent(
+                                                device));
+                                      }),
+                                ]),
+                                decoration: BoxDecoration(
+                                  color: Color(0xff20202B),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                margin: EdgeInsets.symmetric(vertical: 20),
+                                padding: EdgeInsets.fromLTRB(20, 10, 20, 10))
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ])));
   }
 }
