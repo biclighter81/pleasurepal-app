@@ -40,7 +40,7 @@ class DeviceManagerDeviceActiveEvent extends DeviceManagerEvent {
 }
 
 class DeviceManagerCommandEvent extends DeviceManagerEvent {
-  final PleasurepalDeviceCommand command;
+  final dynamic command;
 
   DeviceManagerCommandEvent(this.command);
 }
@@ -138,7 +138,6 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
       event.device.vibrate(ButtplugDeviceCommand.setAll(VibrateComponent(0)));
       */
       _internalClient?.stopAllDevices();
-
       emit(DeviceManagerDeviceOnlineState(deviceBloc));
     });
 
@@ -188,17 +187,37 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
         return;
       }
       _devices.forEach((element) async {
+        await _internalClient?.stopAllDevices();
         if (element.active) {
-          print("Sending command to ${element.device?.name}");
-          await _internalClient?.stopAllDevices();
-          print(event.command.duration);
-          await element.device!.vibrate(ButtplugDeviceCommand.setAll(
-              VibrateComponent(event.command.intensity!)));
-          //vibrate for 10 seconds
-          Future.delayed(Duration(seconds: event.command.duration!.toInt()),
-              () async {
+          if (event.command is PleasurepalDeviceCommandVibrate) {
+            var cmd = event.command as PleasurepalDeviceCommandVibrate;
+            await element.device?.vibrate(
+                ButtplugDeviceCommand.setAll(VibrateComponent(cmd.intensity)));
+            Future.delayed(Duration(seconds: cmd.duration.round()), () async {
+              await _internalClient?.stopAllDevices();
+            });
+          }
+          if (event.command is PleasurepalDeviceCommandRotate) {
+            var cmd = event.command as PleasurepalDeviceCommandRotate;
+            await element.device?.rotate(ButtplugDeviceCommand.setAll(
+                RotateComponent(cmd.speed, cmd.clockwise ?? true)));
+            Future.delayed(Duration(seconds: cmd.duration.round()), () async {
+              await _internalClient?.stopAllDevices();
+            });
+          }
+          if (event.command is PleasurepalDeviceCommandLinear) {
+            var cmd = event.command as PleasurepalDeviceCommandLinear;
+            await element.device?.linear(ButtplugDeviceCommand.setAll(
+                LinearComponent(cmd.position, cmd.duration.round())));
+          }
+          if (event.command is PleasurepalDeviceCommandScalar) {
+            var cmd = event.command as PleasurepalDeviceCommandScalar;
+            await element.device?.scalar(ButtplugDeviceCommand.setAll(
+                ScalarComponent(cmd.scalar, cmd.actuatorType)));
+          }
+          if (event.command is PleasurepalDeviceCommandStop) {
             await _internalClient?.stopAllDevices();
-          });
+          }
         }
       });
     }));

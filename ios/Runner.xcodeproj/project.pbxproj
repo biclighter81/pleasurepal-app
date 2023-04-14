@@ -26,13 +26,6 @@
 			remoteGlobalIDString = CA60C64BEB2CA96E367A6574;
 			remoteInfo = "engine-staticlib";
 		};
-		35AE0E4329DF17C600F5665D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 35AE0E3C29DF17C600F5665D /* buttplug-rs.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CA6015F036F2586451089601;
-			remoteInfo = "engine-cdylib";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -88,7 +81,6 @@
 			isa = PBXGroup;
 			children = (
 				35AE0E4229DF17C600F5665D /* libengine_static.a */,
-				35AE0E4429DF17C600F5665D /* engine.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -228,13 +220,6 @@
 			fileType = archive.ar;
 			path = libengine_static.a;
 			remoteRef = 35AE0E4129DF17C600F5665D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		35AE0E4429DF17C600F5665D /* engine.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = engine.dylib;
-			remoteRef = 35AE0E4329DF17C600F5665D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -422,6 +407,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pleasurepal.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_STYLE = "non-global";
@@ -553,6 +539,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pleasurepal.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_STYLE = "non-global";
@@ -578,6 +565,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pleasurepal.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_STYLE = "non-global";

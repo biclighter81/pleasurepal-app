@@ -130,7 +130,7 @@ class PleasurepalView extends StatelessWidget {
                 onSurface: Color(0xffFFFFFF)),
             //color scheme background
             useMaterial3: true),
-        initialRoute: '/',
+        initialRoute: '/login',
         routes: {
           '/login': (context) => const LoginPage(),
           '/': (context) => const PleasurepalPage(),

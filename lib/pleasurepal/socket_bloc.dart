@@ -44,6 +44,36 @@ class SocketEventPleasurepalCommand extends SocketEvent {
   SocketEventPleasurepalCommand(this.command);
 }
 
+class SocketEventPleasurepalCommandVibrate extends SocketEvent {
+  final PleasurepalDeviceCommandVibrate command;
+
+  SocketEventPleasurepalCommandVibrate(this.command);
+}
+
+class SocketEventPleasurepalCommandStop extends SocketEvent {
+  final PleasurepalDeviceCommandStop command;
+
+  SocketEventPleasurepalCommandStop(this.command);
+}
+
+class SocketEventPleasurepalCommandRotate extends SocketEvent {
+  final PleasurepalDeviceCommandRotate command;
+
+  SocketEventPleasurepalCommandRotate(this.command);
+}
+
+class SocketEventPleasurepalCommandLinear extends SocketEvent {
+  final PleasurepalDeviceCommandLinear command;
+
+  SocketEventPleasurepalCommandLinear(this.command);
+}
+
+class SocketEventPleasurepalCommandScalar extends SocketEvent {
+  final PleasurepalDeviceCommandScalar command;
+
+  SocketEventPleasurepalCommandScalar(this.command);
+}
+
 class SocketEventConnect extends SocketEvent {
   final Credential credential;
 
@@ -60,9 +90,32 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
       emit(SocketConnecting());
       try {
         var socket = await connectSocket(event.credential);
+        socket.on('connect', (_) {
+          print('connected');
+        });
         socket.on('device-command', (data) {
           var command = PleasurepalDeviceCommand.fromJson(data);
           add(SocketEventPleasurepalCommand(command));
+        });
+        socket.on('device-vibrate', (data) {
+          var command = PleasurepalDeviceCommandVibrate.fromJson(data);
+          add(SocketEventPleasurepalCommandVibrate(command));
+        });
+        socket.on('device-stop', (data) {
+          var command = PleasurepalDeviceCommandStop.fromJson(data);
+          add(SocketEventPleasurepalCommandStop(command));
+        });
+        socket.on('device-rotate', (data) {
+          var command = PleasurepalDeviceCommandRotate.fromJson(data);
+          add(SocketEventPleasurepalCommandRotate(command));
+        });
+        socket.on('device-linear', (data) {
+          var command = PleasurepalDeviceCommandLinear.fromJson(data);
+          add(SocketEventPleasurepalCommandLinear(command));
+        });
+        socket.on('device-scalar', (data) {
+          var command = PleasurepalDeviceCommandScalar.fromJson(data);
+          add(SocketEventPleasurepalCommandScalar(command));
         });
         emit(SocketReady());
       } catch (e) {
@@ -71,6 +124,21 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
       }
     });
     on<SocketEventPleasurepalCommand>((event, emit) async {
+      emit(SocketCommand(event.command));
+    });
+    on<SocketEventPleasurepalCommandVibrate>((event, emit) async {
+      emit(SocketCommand(event.command));
+    });
+    on<SocketEventPleasurepalCommandStop>((event, emit) async {
+      emit(SocketCommand(event.command));
+    });
+    on<SocketEventPleasurepalCommandRotate>((event, emit) async {
+      emit(SocketCommand(event.command));
+    });
+    on<SocketEventPleasurepalCommandLinear>((event, emit) async {
+      emit(SocketCommand(event.command));
+    });
+    on<SocketEventPleasurepalCommandScalar>((event, emit) async {
       emit(SocketCommand(event.command));
     });
   }

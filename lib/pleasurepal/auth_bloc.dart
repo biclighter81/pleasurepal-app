@@ -5,7 +5,7 @@ import 'package:openid_client/openid_client_io.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const issuerUrl = 'https://keycloak.rimraf.de/realms/pleasurepal';
-const clientId = 'pleasurepal';
+const clientId = 'pleasurepal-app';
 
 Future<Client> getClient() async {
   var issuer = await Issuer.discover(Uri.parse(issuerUrl));
