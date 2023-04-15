@@ -130,14 +130,6 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
     on<DeviceManagerDeviceAddedEvent>((event, emit) {
       var deviceBloc = DeviceCubit(event.device);
       _devices.add(DeviceCubitState(event.device));
-      /*event.device
-          .rotate(ButtplugDeviceCommand.setAll(RotateComponent(0, true)));
-      event.device.linear(ButtplugDeviceCommand.setAll(LinearComponent(0, 0)));
-      event.device.scalar(ButtplugDeviceCommand.setAll(
-          ScalarComponent(0, ActuatorType.Vibrate)));
-      event.device.vibrate(ButtplugDeviceCommand.setAll(VibrateComponent(0)));
-      */
-      _internalClient?.stopAllDevices();
       emit(DeviceManagerDeviceOnlineState(deviceBloc));
     });
 
@@ -181,47 +173,8 @@ class DeviceManagerBloc extends Bloc<DeviceManagerEvent, DeviceManagerState> {
       await _internalClient!.stopScanning();
       emit(DeviceManagerStopScanningState());
     }));
-
-    on<DeviceManagerCommandEvent>(((event, emit) async {
-      if (_internalClient == null) {
-        return;
-      }
-      _devices.forEach((element) async {
-        await _internalClient?.stopAllDevices();
-        if (element.active) {
-          if (event.command is PleasurepalDeviceCommandVibrate) {
-            var cmd = event.command as PleasurepalDeviceCommandVibrate;
-            await element.device?.vibrate(
-                ButtplugDeviceCommand.setAll(VibrateComponent(cmd.intensity)));
-            Future.delayed(Duration(seconds: cmd.duration.round()), () async {
-              await _internalClient?.stopAllDevices();
-            });
-          }
-          if (event.command is PleasurepalDeviceCommandRotate) {
-            var cmd = event.command as PleasurepalDeviceCommandRotate;
-            await element.device?.rotate(ButtplugDeviceCommand.setAll(
-                RotateComponent(cmd.speed, cmd.clockwise ?? true)));
-            Future.delayed(Duration(seconds: cmd.duration.round()), () async {
-              await _internalClient?.stopAllDevices();
-            });
-          }
-          if (event.command is PleasurepalDeviceCommandLinear) {
-            var cmd = event.command as PleasurepalDeviceCommandLinear;
-            await element.device?.linear(ButtplugDeviceCommand.setAll(
-                LinearComponent(cmd.position, cmd.duration.round())));
-          }
-          if (event.command is PleasurepalDeviceCommandScalar) {
-            var cmd = event.command as PleasurepalDeviceCommandScalar;
-            await element.device?.scalar(ButtplugDeviceCommand.setAll(
-                ScalarComponent(cmd.scalar, cmd.actuatorType)));
-          }
-          if (event.command is PleasurepalDeviceCommandStop) {
-            await _internalClient?.stopAllDevices();
-          }
-        }
-      });
-    }));
   }
   List<DeviceCubitState> get devices => _devices;
   bool get scanning => _scanning;
+  ButtplugClient get client => _internalClient!;
 }

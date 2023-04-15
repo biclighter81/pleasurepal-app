@@ -54,22 +54,19 @@ class PleasurepalApp extends StatelessWidget {
       // Make sure the engine is stopped, just in case we've reloaded.
       repo.stop();
     }
-    var socketBloc = SocketBloc();
+    var engineControlBloc = EngineControlBloc(repo);
+    engineControlBloc.add(EngineControlEventStart());
+    var deviceControlBloc =
+        DeviceManagerBloc(engineControlBloc.stream, engineControlBloc.add);
+
+    var socketBloc = SocketBloc(deviceControlBloc);
     var authBloc = AuthBloc();
     authBloc.stream.listen((state) {
       if (state is AuthSuccess) {
         socketBloc.add(SocketEventConnect(state.credential));
       }
     });
-    var engineControlBloc = EngineControlBloc(repo);
-    engineControlBloc.add(EngineControlEventStart());
-    var deviceControlBloc =
-        DeviceManagerBloc(engineControlBloc.stream, engineControlBloc.add);
-    socketBloc.stream.listen((state) {
-      if (state is SocketCommand) {
-        deviceControlBloc.add(DeviceManagerCommandEvent(state.command));
-      }
-    });
+
     engineControlBloc.stream.forEach((state) {
       if (state is ServerLogMessageState) {
         print(state.message.message);

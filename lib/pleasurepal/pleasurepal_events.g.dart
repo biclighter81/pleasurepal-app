@@ -72,6 +72,7 @@ PleasurepalDeviceCommandScalar _$PleasurepalDeviceCommandScalarFromJson(
         Map<String, dynamic> json) =>
     PleasurepalDeviceCommandScalar()
       ..scalar = (json['scalar'] as num).toDouble()
+      ..duration = (json['duration'] as num).toDouble()
       ..actuatorType = $enumDecode(_$ActuatorTypeEnumMap, json['actuatorType'])
       ..args = json['args'] as Map<String, dynamic>?;
 
@@ -79,6 +80,7 @@ Map<String, dynamic> _$PleasurepalDeviceCommandScalarToJson(
         PleasurepalDeviceCommandScalar instance) =>
     <String, dynamic>{
       'scalar': instance.scalar,
+      'duration': instance.duration,
       'actuatorType': _$ActuatorTypeEnumMap[instance.actuatorType]!,
       'args': instance.args,
     };

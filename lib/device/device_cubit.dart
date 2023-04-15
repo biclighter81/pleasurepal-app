@@ -18,7 +18,6 @@ class DeviceCubit extends Cubit<DeviceState> {
   ButtplugClientDevice? _clientDevice;
   List<DeviceActuatorCubit> _actuators = [];
   List<DeviceSensorBloc> _sensors = [];
-  // DeviceConfiguration _deviceConfiguration;
 
   DeviceCubit(this._clientDevice) : super(DeviceStateInitial()) {
     setOnline(_clientDevice!);

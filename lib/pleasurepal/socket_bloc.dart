@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:buttplug/buttplug.dart';
 import 'package:flutter/foundation.dart';
 import 'package:openid_client/openid_client.dart';
+import 'package:pleasurepal/device/device_manager_bloc.dart';
 import 'package:pleasurepal/pleasurepal/pleasurepal_events.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
@@ -30,49 +32,7 @@ class SocketReady extends SocketState {}
 
 class SocketError extends SocketState {}
 
-class SocketCommand extends SocketState {
-  final dynamic command;
-
-  SocketCommand(this.command);
-}
-
 class SocketEvent {}
-
-class SocketEventPleasurepalCommand extends SocketEvent {
-  final PleasurepalDeviceCommand command;
-
-  SocketEventPleasurepalCommand(this.command);
-}
-
-class SocketEventPleasurepalCommandVibrate extends SocketEvent {
-  final PleasurepalDeviceCommandVibrate command;
-
-  SocketEventPleasurepalCommandVibrate(this.command);
-}
-
-class SocketEventPleasurepalCommandStop extends SocketEvent {
-  final PleasurepalDeviceCommandStop command;
-
-  SocketEventPleasurepalCommandStop(this.command);
-}
-
-class SocketEventPleasurepalCommandRotate extends SocketEvent {
-  final PleasurepalDeviceCommandRotate command;
-
-  SocketEventPleasurepalCommandRotate(this.command);
-}
-
-class SocketEventPleasurepalCommandLinear extends SocketEvent {
-  final PleasurepalDeviceCommandLinear command;
-
-  SocketEventPleasurepalCommandLinear(this.command);
-}
-
-class SocketEventPleasurepalCommandScalar extends SocketEvent {
-  final PleasurepalDeviceCommandScalar command;
-
-  SocketEventPleasurepalCommandScalar(this.command);
-}
 
 class SocketEventConnect extends SocketEvent {
   final Credential credential;
@@ -85,61 +45,91 @@ class SocketEventDisconnect extends SocketEvent {}
 class SocketEventError extends SocketEvent {}
 
 class SocketBloc extends Bloc<SocketEvent, SocketState> {
-  SocketBloc() : super(SocketInitial()) {
+  final DeviceManagerBloc deviceBloc;
+  Map<String, Timer> deviceTimers = {};
+
+  SocketBloc(this.deviceBloc) : super(SocketInitial()) {
     on<SocketEventConnect>((event, emit) async {
       emit(SocketConnecting());
       try {
         var socket = await connectSocket(event.credential);
         socket.on('connect', (_) {
-          print('connected');
+          print('Connected to socket!');
         });
-        socket.on('device-command', (data) {
-          var command = PleasurepalDeviceCommand.fromJson(data);
-          add(SocketEventPleasurepalCommand(command));
+        socket.on('disconnect', (_) {
+          print('Disconnected from socket!');
         });
         socket.on('device-vibrate', (data) {
-          var command = PleasurepalDeviceCommandVibrate.fromJson(data);
-          add(SocketEventPleasurepalCommandVibrate(command));
+          var cmd = PleasurepalDeviceCommandVibrate.fromJson(data);
+          deviceBloc.devices
+              .where((element) => element.active)
+              .forEach((element) {
+            if (deviceTimers[element.device!.name] != null) {
+              deviceTimers[element.device!.name]!.cancel();
+            }
+            element.device?.vibrate(
+                ButtplugDeviceCommand.setAll(VibrateComponent(cmd.intensity)));
+            deviceTimers[element.device!.name] =
+                Timer(Duration(seconds: cmd.duration.round()), () {
+              element.device
+                  ?.vibrate(ButtplugDeviceCommand.setAll(VibrateComponent(0)));
+            });
+          });
         });
         socket.on('device-stop', (data) {
-          var command = PleasurepalDeviceCommandStop.fromJson(data);
-          add(SocketEventPleasurepalCommandStop(command));
+          deviceBloc.client.stopAllDevices();
         });
         socket.on('device-rotate', (data) {
-          var command = PleasurepalDeviceCommandRotate.fromJson(data);
-          add(SocketEventPleasurepalCommandRotate(command));
+          var cmd = PleasurepalDeviceCommandRotate.fromJson(data);
+          deviceBloc.devices
+              .where((element) => element.active)
+              .forEach((element) {
+            if (deviceTimers[element.device!.name] != null) {
+              deviceTimers[element.device!.name]!.cancel();
+            }
+            element.device?.rotate(ButtplugDeviceCommand.setAll(
+                RotateComponent(cmd.speed, cmd.clockwise ?? true)));
+            deviceTimers[element.device!.name] =
+                Timer(Duration(seconds: cmd.duration.round()), () {
+              element.device?.rotate(
+                  ButtplugDeviceCommand.setAll(RotateComponent(0, true)));
+            });
+          });
         });
         socket.on('device-linear', (data) {
-          var command = PleasurepalDeviceCommandLinear.fromJson(data);
-          add(SocketEventPleasurepalCommandLinear(command));
+          var cmd = PleasurepalDeviceCommandLinear.fromJson(data);
+          deviceBloc.devices
+              .where((element) => element.active)
+              .forEach((element) {
+            if (deviceTimers[element.device!.name] != null) {
+              deviceTimers[element.device!.name]!.cancel();
+            }
+            element.device?.linear(ButtplugDeviceCommand.setAll(
+                LinearComponent(cmd.position, cmd.duration.round())));
+          });
         });
         socket.on('device-scalar', (data) {
-          var command = PleasurepalDeviceCommandScalar.fromJson(data);
-          add(SocketEventPleasurepalCommandScalar(command));
+          var cmd = PleasurepalDeviceCommandScalar.fromJson(data);
+          deviceBloc.devices
+              .where((element) => element.active)
+              .forEach((element) {
+            if (deviceTimers[element.device!.name] != null) {
+              deviceTimers[element.device!.name]!.cancel();
+            }
+            element.device?.scalar(ButtplugDeviceCommand.setAll(
+                ScalarComponent(cmd.scalar, cmd.actuatorType)));
+            deviceTimers[element.device!.name] =
+                Timer(Duration(seconds: cmd.duration.round()), () {
+              element.device?.rotate(
+                  ButtplugDeviceCommand.setAll(RotateComponent(0, true)));
+            });
+          });
         });
         emit(SocketReady());
       } catch (e) {
         print(e);
         emit(SocketError());
       }
-    });
-    on<SocketEventPleasurepalCommand>((event, emit) async {
-      emit(SocketCommand(event.command));
-    });
-    on<SocketEventPleasurepalCommandVibrate>((event, emit) async {
-      emit(SocketCommand(event.command));
-    });
-    on<SocketEventPleasurepalCommandStop>((event, emit) async {
-      emit(SocketCommand(event.command));
-    });
-    on<SocketEventPleasurepalCommandRotate>((event, emit) async {
-      emit(SocketCommand(event.command));
-    });
-    on<SocketEventPleasurepalCommandLinear>((event, emit) async {
-      emit(SocketCommand(event.command));
-    });
-    on<SocketEventPleasurepalCommandScalar>((event, emit) async {
-      emit(SocketCommand(event.command));
     });
   }
 }

@@ -60,6 +60,7 @@ class PleasurepalDeviceCommandLinear {
 @JsonSerializable()
 class PleasurepalDeviceCommandScalar {
   double scalar = 0.0;
+  double duration = 0.0;
   ActuatorType actuatorType = ActuatorType.Vibrate;
   Map<String, dynamic>? args;
   PleasurepalDeviceCommandScalar();
